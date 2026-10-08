@@ -67,6 +67,13 @@ def codifica(u, v, lon, lat, data):
 
     lon = np.asarray(lon, dtype="float64")
     lat = np.asarray(lat, dtype="float64")
+
+    # Il dominio del modello include un pezzo di Atlantico (golfo di Biscaglia,
+    # Atlantico oltre Gibilterra): non e' Mediterraneo, si toglie.
+    LON, LAT = np.meshgrid(lon, lat)
+    atlantico = (LON < -5.6) | ((LAT > 42.0) & (LON < 1.0))
+    u = np.where(atlantico, np.nan, u)
+    v = np.where(atlantico, np.nan, v)
     passo_lon = float(np.median(np.diff(lon)))
     passo_lat = float(np.median(np.diff(lat)))
     velocita = np.hypot(u, v)
