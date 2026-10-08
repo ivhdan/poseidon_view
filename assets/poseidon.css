@@ -245,6 +245,60 @@ html, body {
   font-size: 15px !important;
 }
 
+/* ---------- Animazione correnti ---------- */
+canvas.particles {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+}
+
+/* ---------- Barra dei giorni (stile timeline Windy) ---------- */
+.days {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  background: var(--navy-900);
+  border-bottom: 1px solid var(--rope);
+}
+.days .play {
+  flex: none;
+  width: 40px;
+  border: 0;
+  border-right: 1px solid var(--rope);
+  background: var(--navy-800);
+  color: var(--brass-light);
+  font-size: .95rem;
+  cursor: pointer;
+}
+.days .play:hover { background: var(--navy-700); }
+.days .strip {
+  flex: 1;
+  display: flex;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+.days .strip::-webkit-scrollbar { display: none; }
+.days .day {
+  flex: 1 0 auto;
+  min-width: 52px;
+  padding: 6px 8px 5px;
+  border: 0;
+  border-right: 1px solid rgba(184, 155, 94, .35);
+  background: transparent;
+  color: var(--parchment);
+  font-family: var(--font-title);
+  text-transform: uppercase;
+  cursor: pointer;
+  line-height: 1.1;
+}
+.days .day .dw { display: block; font-size: .56rem; letter-spacing: .16em; color: var(--rope); }
+.days .day .dn { display: block; font-size: .9rem; font-weight: 600; }
+.days .day:hover { background: var(--navy-800); }
+.days .day.on { background: var(--brass-light); color: var(--navy-900); }
+.days .day.on .dw { color: var(--navy-700); }
+
 /* Su schermi molto stretti si nasconde il sottotitolo */
 @media (max-width: 360px) {
   .w-title .sub { display: none; }

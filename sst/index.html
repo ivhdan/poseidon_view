@@ -94,7 +94,7 @@
       .setLatLng(e.latlng).setContent('<small>LETTURA&hellip;</small>').openOn(map);
 
     const r = await PV.featureValue(map, LAYER, e.latlng, sst.date);
-    const coord = `${e.latlng.lat.toFixed(2)}&deg;N &middot; ${e.latlng.lng.toFixed(2)}&deg;E`;
+    const coord = PV.coord(e.latlng);
 
     if (r.value !== undefined) {
       let c = r.value > 200 ? r.value - 273.15 : r.value;    // K -> gradi C

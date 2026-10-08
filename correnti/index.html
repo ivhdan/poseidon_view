@@ -18,11 +18,16 @@
     <span class="anchor">&#9875;</span>
     <div class="w-title">
       <h1>Correnti marine</h1>
-      <div class="sub">Superficie &middot; Mediterraneo</div>
+      <div class="sub">Superficie &middot; 10 giorni</div>
     </div>
     <span class="chip" id="date">&hellip;</span>
     <a class="btn-full" href="./" target="_blank" rel="noopener" title="Apri a schermo intero">&#10530;</a>
   </header>
+
+  <nav class="days" aria-label="Giorno della previsione">
+    <button class="play" id="play" type="button" title="Avvia la previsione">&#9654;</button>
+    <div class="strip" id="strip"></div>
+  </nav>
 
   <div class="w-body">
     <div id="map" class="map"></div>
@@ -40,74 +45,136 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/leaflet-gesture-handling@1.2.2/dist/leaflet-gesture-handling.min.js"></script>
 <script src="../assets/poseidon.js"></script>
+<script src="../assets/correnti-anim.js"></script>
 <script>
 (() => {
-  /* ---- Configurazione ---- */
-
-  // Modello di analisi e previsione del Mediterraneo, media giornaliera, 4,2 km
-  const BASE = 'MEDSEA_ANALYSISFORECAST_PHY_006_013/cmems_mod_med_phy-cur_anfc_4.2km_P1D-m_202511/';
-  const LAYER_VEL = BASE + 'sea_water_velocity';   // modulo + frecce (derivato dal server)
-  const LAYER_U = BASE + 'uo';                     // componente verso est
-  const LAYER_V = BASE + 'vo';                     // componente verso nord
-
-  const V_MAX = 0.8;                               // fondo scala, m/s
-
-  // Colormap "speed" (cmocean), la stessa usata dal server
-  const SPEED = ['#fffdcd', '#eedf98', '#d8c55f', '#b8b22f', '#8ea20b', '#5f920c',
-                 '#32801f', '#0f6b2b', '#10542c', '#193b23', '#172313'];
-
-  /* ---- Avvio ---- */
+  const DATI = '../data/correnti/';
+  const PASSO_PLAY_MS = 3500;            // durata di ogni giorno durante la riproduzione
 
   const statusEl = document.getElementById('status');
   const dateEl = document.getElementById('date');
+  const strip = document.getElementById('strip');
+  const playBtn = document.getElementById('play');
+
   const map = PV.makeMap('map');
-
-  PV.status(statusEl, 'Carico i dati Copernicus…');
-
-  const cur = PV.copernicusLayer(map, {
-    layer: LAYER_VEL,
-    style: `cmap:speed,vectorStyle:solidAndVector,range:0/${V_MAX}`,
-    opacity: 0.85,
-    onDate: d => { dateEl.textContent = PV.prettyDate(d); PV.status(statusEl, ''); },
-    onFail: () => PV.status(statusEl, 'Dati non disponibili al momento. Riprova più tardi.')
-  });
+  const anim = new Correnti.Animazione(map);
+  let overlay = null;
+  let giorni = [];
+  let corrente = -1;
+  const cache = new Map();
 
   PV.legend(document.getElementById('legend'), {
     title: 'Velocità della corrente', unit: 'm/s',
-    min: 0, max: V_MAX, colors: SPEED, ticks: [0, 0.2, 0.4, 0.6, 0.8]
+    min: 0, max: Correnti.V_MAX, colors: Correnti.RAMPA, ticks: [0, 0.2, 0.4, 0.6, 0.8]
+  });
+
+  /* ---- Etichette dei giorni ---- */
+
+  const GG = ['dom', 'lun', 'mar', 'mer', 'gio', 'ven', 'sab'];
+  function etichetta(iso, i) {
+    const d = new Date(iso + 'T12:00:00Z');
+    return { dw: i === 0 && iso === PV.isoDate(0) ? 'oggi' : GG[d.getUTCDay()], dn: d.getUTCDate() };
+  }
+
+  /* ---- Caricamento ---- */
+
+  async function carica(i) {
+    const g = giorni[i];
+    if (!cache.has(g.file)) {
+      cache.set(g.file, fetch(DATI + g.file, { cache: 'no-cache' })
+        .then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
+        .then(j => new Correnti.Campo(j)));
+    }
+    return cache.get(g.file);
+  }
+
+  async function mostra(i) {
+    if (i === corrente) return;
+    corrente = i;
+    strip.querySelectorAll('.day').forEach((b, k) => b.classList.toggle('on', k === i));
+    const btn = strip.children[i];
+    if (btn) btn.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+    try {
+      const campo = await carica(i);
+      if (i !== corrente) return;        // nel frattempo e' stato scelto un altro giorno
+      const url = campo.image();
+      if (overlay) overlay.setUrl(url);
+      else overlay = L.imageOverlay(url, campo.bounds(), { opacity: 0.92, interactive: false }).addTo(map);
+      anim.setCampo(campo);
+      dateEl.textContent = PV.prettyDate(campo.data);
+      PV.status(statusEl, '');
+      if (i + 1 < giorni.length) carica(i + 1);   // precarica il giorno dopo
+    } catch (e) {
+      PV.status(statusEl, 'Dati del giorno non disponibili.');
+    }
+  }
+
+  async function avvio() {
+    PV.status(statusEl, 'Carico le correnti…');
+    try {
+      const r = await fetch(DATI + 'index.json', { cache: 'no-cache' });
+      if (!r.ok) throw new Error(r.status);
+      const idx = await r.json();
+      // si parte da oggi: i giorni gia' passati non si mostrano
+      const oggi = PV.isoDate(0);
+      giorni = idx.giorni.filter(g => g.data >= oggi);
+      if (!giorni.length) giorni = idx.giorni.slice(-1);
+    } catch (e) {
+      PV.status(statusEl, 'Dati in aggiornamento, riprova più tardi.');
+      return;
+    }
+
+    giorni.forEach((g, i) => {
+      const t = etichetta(g.data, i);
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'day';
+      b.innerHTML = `<span class="dw">${t.dw}</span><span class="dn">${t.dn}</span>`;
+      b.addEventListener('click', () => { ferma(); mostra(i); });
+      strip.appendChild(b);
+    });
+    mostra(0);
+  }
+
+  /* ---- Riproduzione dei giorni ---- */
+
+  let timer = null;
+  function ferma() {
+    clearInterval(timer); timer = null;
+    playBtn.innerHTML = '&#9654;';
+    playBtn.title = 'Avvia la previsione';
+  }
+  playBtn.addEventListener('click', () => {
+    if (timer) { ferma(); return; }
+    if (!giorni.length) return;
+    playBtn.innerHTML = '&#10074;&#10074;';
+    playBtn.title = 'Ferma';
+    timer = setInterval(() => mostra((corrente + 1) % giorni.length), PASSO_PLAY_MS);
   });
 
   /* ---- Tocco sul mare: velocita' e direzione ---- */
 
   const ROSA = ['N', 'NE', 'E', 'SE', 'S', 'SO', 'O', 'NO'];
-
   map.on('click', async e => {
-    const popup = L.popup({ closeButton: false, autoPan: false })
-      .setLatLng(e.latlng).setContent('<small>LETTURA&hellip;</small>').openOn(map);
-
-    const [u, v] = await Promise.all([
-      PV.featureValue(map, LAYER_U, e.latlng, cur.date),
-      PV.featureValue(map, LAYER_V, e.latlng, cur.date)
-    ]);
-    const coord = `${e.latlng.lat.toFixed(2)}&deg;N &middot; ${e.latlng.lng.toFixed(2)}&deg;E`;
-
-    if (u.value !== undefined && v.value !== undefined) {
-      const speed = Math.hypot(u.value, v.value);
-      const nodi = speed * 1.943844;
-      // direzione verso cui scorre la corrente (convenzione oceanografica)
-      const deg = (Math.atan2(u.value, v.value) * 180 / Math.PI + 360) % 360;
-      const verso = ROSA[Math.round(deg / 45) % 8];
-      popup.setContent(
-        `<b>${speed.toFixed(2).replace('.', ',')} m/s</b> ` +
-        `<span>(${nodi.toFixed(1).replace('.', ',')} nodi)</span><br>` +
-        `<span>verso ${verso} &middot; ${Math.round(deg)}&deg;</span><br>` +
-        `<small>${coord}</small>`);
-    } else if (u.error === 'nodata' || v.error === 'nodata') {
-      popup.setContent(`<small>NESSUN DATO QUI</small><br><small>${coord}</small>`);
+    if (corrente < 0) return;
+    const campo = await carica(corrente);
+    const vel = campo.at(e.latlng.lng, e.latlng.lat) || campo.nearest(e.latlng.lng, e.latlng.lat);
+    const coord = PV.coord(e.latlng);
+    let html;
+    if (vel) {
+      const s = Math.hypot(vel[0], vel[1]);
+      const deg = (Math.atan2(vel[0], vel[1]) * 180 / Math.PI + 360) % 360;   // verso cui scorre
+      html = `<b>${s.toFixed(2).replace('.', ',')} m/s</b> ` +
+             `(${(s * 1.943844).toFixed(1).replace('.', ',')} nodi)<br>` +
+             `verso ${ROSA[Math.round(deg / 45) % 8]} &middot; ${Math.round(deg)}&deg;<br>` +
+             `<small>${coord}</small>`;
     } else {
-      popup.setContent('<small>LETTURA PUNTUALE NON DISPONIBILE</small>');
+      html = `<small>NESSUN DATO QUI</small><br><small>${coord}</small>`;
     }
+    L.popup({ closeButton: false, autoPan: false }).setLatLng(e.latlng).setContent(html).openOn(map);
   });
+
+  avvio();
 })();
 </script>
 </body>

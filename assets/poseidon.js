@@ -8,6 +8,7 @@ const PV = (() => {
   const WMTS = 'https://wmts.marine.copernicus.eu/teroWmts';
   const MAX_NATIVE_ZOOM = 10;            // il WMTS espone TILEMATRIX 0..10
   const MED_BOUNDS = [[30.0, -6.0], [46.2, 36.5]];
+  const ITA_BOUNDS = [[36.0, 7.0], [45.8, 18.8]];
 
   /* ---------- Date ---------- */
 
@@ -108,7 +109,9 @@ const PV = (() => {
       maxBoundsViscosity: 0.8,
       worldCopyJump: false
     });
-    map.fitBounds(MED_BOUNDS, { padding: [4, 4] });
+    // Su schermo stretto (telefono) si parte dai mari italiani, altrimenti tutto il Mediterraneo
+    const stretto = document.getElementById(id).clientWidth < 600;
+    map.fitBounds(stretto ? ITA_BOUNDS : MED_BOUNDS, { padding: [4, 4] });
 
     const carto = '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/">CARTO</a>';
 
@@ -196,5 +199,11 @@ const PV = (() => {
     el.classList.add('show');
   }
 
-  return { isoDate, prettyDate, tileUrl, featureValue, makeMap, copernicusLayer, legend, status };
+  // 43.12 N · 3.40 O  (ovest per longitudini negative)
+  function coord(ll) {
+    const f = x => Math.abs(x).toFixed(2).replace('.', ',');
+    return `${f(ll.lat)}&deg;${ll.lat >= 0 ? 'N' : 'S'} &middot; ${f(ll.lng)}&deg;${ll.lng >= 0 ? 'E' : 'O'}`;
+  }
+
+  return { coord, isoDate, prettyDate, tileUrl, featureValue, makeMap, copernicusLayer, legend, status };
 })();
