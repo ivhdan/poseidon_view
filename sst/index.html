@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Temperatura del Mediterraneo &middot; Mito Sub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cinzel:wght@400;600&family=Crimson+Pro:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet-gesture-handling@1.2.2/dist/leaflet-gesture-handling.min.css">
+<link rel="stylesheet" href="../assets/poseidon.css">
+</head>
+<body>
+
+<div class="widget">
+
+  <header class="w-head">
+    <span class="anchor">&#9875;</span>
+    <div class="w-title">
+      <h1>Temperatura del mare</h1>
+      <div class="sub">Superficie &middot; Mediterraneo</div>
+    </div>
+    <span class="chip" id="date">&hellip;</span>
+    <a class="btn-full" href="./" target="_blank" rel="noopener" title="Apri a schermo intero">&#10530;</a>
+  </header>
+
+  <div class="w-body">
+    <div id="map" class="map"></div>
+    <div id="status" class="status"></div>
+    <div id="legend" class="legend"></div>
+  </div>
+
+  <footer class="w-foot">
+    <span>Tocca il mare per leggere la temperatura</span>
+    <span>Dati: <a href="https://data.marine.copernicus.eu/product/SST_MED_SST_L4_NRT_OBSERVATIONS_010_004" target="_blank" rel="noopener">Copernicus Marine</a></span>
+  </footer>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/leaflet-gesture-handling@1.2.2/dist/leaflet-gesture-handling.min.js"></script>
+<script src="../assets/poseidon.js"></script>
+<script>
+(() => {
+  /* ---- Configurazione ---- */
+
+  // Temperatura superficiale osservata da satellite, analisi L4 giornaliera
+  const LAYER = 'SST_MED_SST_L4_NRT_OBSERVATIONS_010_004/' +
+                'SST_MED_SST_L4_NRT_OBSERVATIONS_010_004_a_V2_202311/analysed_sst';
+
+  // Il dato "analysed_sst" e' in kelvin: la scala si imposta in K
+  const DATA_IN_KELVIN = true;
+
+  // Scala colori stagionale (gradi C): piu' contrasto mese per mese
+  const SCALA_MESE = [
+    [12, 19], [12, 18], [12, 19], [13, 21], [15, 24], [18, 28],
+    [21, 30], [22, 31], [20, 29], [17, 26], [15, 23], [13, 21]
+  ];
+
+  // Colormap "thermal" (cmocean), la stessa usata dal server
+  const THERMAL = ['#042333', '#0f326a', '#40349f', '#674396', '#8b538d', '#b15f82',
+                   '#d66c6c', '#f3824d', '#fca63c', '#f7d045', '#e8fa5b'];
+
+  /* ---- Avvio ---- */
+
+  const [tMin, tMax] = SCALA_MESE[new Date().getMonth()];
+  const k = DATA_IN_KELVIN ? 273.15 : 0;
+  const style = `cmap:thermal,range:${(tMin + k).toFixed(2)}/${(tMax + k).toFixed(2)}`;
+
+  const statusEl = document.getElementById('status');
+  const dateEl = document.getElementById('date');
+  const map = PV.makeMap('map');
+
+  PV.status(statusEl, 'Carico i dati Copernicus…');
+
+  const sst = PV.copernicusLayer(map, {
+    layer: LAYER,
+    style,
+    onDate: d => { dateEl.textContent = PV.prettyDate(d); PV.status(statusEl, ''); },
+    onFail: () => PV.status(statusEl, 'Dati non disponibili al momento. Riprova più tardi.')
+  });
+
+  const ticks = [];
+  for (let t = Math.ceil(tMin / 2) * 2; t <= tMax; t += 2) ticks.push(t);
+  PV.legend(document.getElementById('legend'), {
+    title: 'Temperatura superficiale', unit: '°C',
+    min: tMin, max: tMax, colors: THERMAL, ticks
+  });
+
+  /* ---- Tocco sul mare: valore puntuale ---- */
+
+  map.on('click', async e => {
+    const popup = L.popup({ closeButton: false, autoPan: false })
+      .setLatLng(e.latlng).setContent('<small>LETTURA&hellip;</small>').openOn(map);
+
+    const r = await PV.featureValue(map, LAYER, e.latlng, sst.date);
+    const coord = `${e.latlng.lat.toFixed(2)}&deg;N &middot; ${e.latlng.lng.toFixed(2)}&deg;E`;
+
+    if (r.value !== undefined) {
+      let c = r.value > 200 ? r.value - 273.15 : r.value;    // K -> gradi C
+      popup.setContent(`<b>${c.toFixed(1).replace('.', ',')} &deg;C</b><br><small>${coord}</small>`);
+    } else if (r.error === 'nodata') {
+      popup.setContent(`<small>NESSUN DATO QUI</small><br><small>${coord}</small>`);
+    } else {
+      popup.setContent('<small>LETTURA PUNTUALE NON DISPONIBILE</small>');
+    }
+  });
+})();
+</script>
+</body>
+</html>

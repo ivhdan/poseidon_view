@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Poseidon View &middot; Mito Sub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cinzel:wght@400;600&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root { --navy:#0a1e33; --parch:#f0e8d4; --rope:#b89b5e; --brass:#c8963c; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--parch); color:var(--navy); font-family:'Crimson Pro',Georgia,serif; }
+  main { max-width: 820px; margin: 0 auto; padding: 24px 16px 48px; }
+  .kicker { font-family:'Cinzel',serif; font-size:.68rem; letter-spacing:.24em; color:#2e6d99; text-align:center; }
+  h1 { font-family:'Cinzel Decorative',serif; font-size:clamp(1.6rem,6vw,2.4rem); text-align:center; margin:.3em 0 .1em; }
+  .lead { text-align:center; font-size:1.1rem; font-style:italic; margin:0 0 20px; }
+  .rope { display:flex; align-items:center; gap:12px; margin:22px 0; color:var(--brass); font-size:1.3rem; }
+  .rope::before, .rope::after { content:''; flex:1; height:2px; opacity:.7;
+    background:repeating-linear-gradient(90deg,#b89b5e 0,#b89b5e 6px,transparent 6px,transparent 10px,#d9c89a 10px,#d9c89a 16px,transparent 16px,transparent 20px); }
+  h2 { font-family:'Cinzel',serif; font-size:1rem; letter-spacing:.14em; text-transform:uppercase; margin:0 0 8px; }
+  p { font-size:1.05rem; line-height:1.5; margin:0 0 12px; }
+  iframe { display:block; width:100%; border:0; background:var(--navy); }
+  .h-map { height: 460px; }
+  .soon { padding:28px 16px; text-align:center; background:var(--navy); color:var(--parch); border:1px solid var(--rope);
+          font-family:'Cinzel',serif; letter-spacing:.14em; font-size:.8rem; text-transform:uppercase; }
+  footer { font-family:'Cinzel',serif; font-size:.6rem; letter-spacing:.2em; color:var(--rope); text-align:center; margin-top:32px; }
+</style>
+</head>
+<body>
+<main>
+  <div class="kicker">MITO SUB &middot; IL MARE OGGI</div>
+  <h1>Poseidon View</h1>
+  <p class="lead">Temperature e correnti del Mediterraneo, aggiornate ogni giorno dai dati Copernicus.</p>
+
+  <div class="rope">&#9875;</div>
+
+  <h2>Temperatura del mare</h2>
+  <p>La temperatura dell'acqua in superficie misurata dai satelliti. Tocca un punto del mare per leggere il valore.</p>
+  <iframe class="h-map" src="sst/" title="Temperatura del Mediterraneo" loading="lazy"></iframe>
+
+  <div class="rope">&#9875;</div>
+
+  <h2>Correnti marine</h2>
+  <p>Velocit&agrave; e direzione delle correnti superficiali dal modello oceanografico del Mediterraneo.</p>
+  <iframe class="h-map" src="correnti/" title="Correnti del Mediterraneo" loading="lazy"></iframe>
+
+  <div class="rope">&#9875;</div>
+
+  <h2>Il Mediterraneo si scalda</h2>
+  <p>Temperature medie mensili dal 2000 a oggi.</p>
+  <div class="soon">Grafico in preparazione</div>
+
+  <footer>MITO SUB &middot; A.S.D. &middot; SUSA &middot; DATI E.U. COPERNICUS MARINE SERVICE</footer>
+</main>
+</body>
+</html>

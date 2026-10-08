@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Correnti del Mediterraneo &middot; Mito Sub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cinzel:wght@400;600&family=Crimson+Pro:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet-gesture-handling@1.2.2/dist/leaflet-gesture-handling.min.css">
+<link rel="stylesheet" href="../assets/poseidon.css">
+</head>
+<body>
+
+<div class="widget">
+
+  <header class="w-head">
+    <span class="anchor">&#9875;</span>
+    <div class="w-title">
+      <h1>Correnti marine</h1>
+      <div class="sub">Superficie &middot; Mediterraneo</div>
+    </div>
+    <span class="chip" id="date">&hellip;</span>
+    <a class="btn-full" href="./" target="_blank" rel="noopener" title="Apri a schermo intero">&#10530;</a>
+  </header>
+
+  <div class="w-body">
+    <div id="map" class="map"></div>
+    <div id="status" class="status"></div>
+    <div id="legend" class="legend"></div>
+  </div>
+
+  <footer class="w-foot">
+    <span>Tocca il mare per velocit&agrave; e direzione</span>
+    <span>Dati: <a href="https://data.marine.copernicus.eu/product/MEDSEA_ANALYSISFORECAST_PHY_006_013" target="_blank" rel="noopener">Copernicus Marine</a></span>
+  </footer>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/leaflet-gesture-handling@1.2.2/dist/leaflet-gesture-handling.min.js"></script>
+<script src="../assets/poseidon.js"></script>
+<script>
+(() => {
+  /* ---- Configurazione ---- */
+
+  // Modello di analisi e previsione del Mediterraneo, media giornaliera, 4,2 km
+  const BASE = 'MEDSEA_ANALYSISFORECAST_PHY_006_013/cmems_mod_med_phy-cur_anfc_4.2km_P1D-m_202511/';
+  const LAYER_VEL = BASE + 'sea_water_velocity';   // modulo + frecce (derivato dal server)
+  const LAYER_U = BASE + 'uo';                     // componente verso est
+  const LAYER_V = BASE + 'vo';                     // componente verso nord
+
+  const V_MAX = 0.8;                               // fondo scala, m/s
+
+  // Colormap "speed" (cmocean), la stessa usata dal server
+  const SPEED = ['#fffdcd', '#eedf98', '#d8c55f', '#b8b22f', '#8ea20b', '#5f920c',
+                 '#32801f', '#0f6b2b', '#10542c', '#193b23', '#172313'];
+
+  /* ---- Avvio ---- */
+
+  const statusEl = document.getElementById('status');
+  const dateEl = document.getElementById('date');
+  const map = PV.makeMap('map');
+
+  PV.status(statusEl, 'Carico i dati Copernicus…');
+
+  const cur = PV.copernicusLayer(map, {
+    layer: LAYER_VEL,
+    style: `cmap:speed,vectorStyle:solidAndVector,range:0/${V_MAX}`,
+    opacity: 0.85,
+    onDate: d => { dateEl.textContent = PV.prettyDate(d); PV.status(statusEl, ''); },
+    onFail: () => PV.status(statusEl, 'Dati non disponibili al momento. Riprova più tardi.')
+  });
+
+  PV.legend(document.getElementById('legend'), {
+    title: 'Velocità della corrente', unit: 'm/s',
+    min: 0, max: V_MAX, colors: SPEED, ticks: [0, 0.2, 0.4, 0.6, 0.8]
+  });
+
+  /* ---- Tocco sul mare: velocita' e direzione ---- */
+
+  const ROSA = ['N', 'NE', 'E', 'SE', 'S', 'SO', 'O', 'NO'];
+
+  map.on('click', async e => {
+    const popup = L.popup({ closeButton: false, autoPan: false })
+      .setLatLng(e.latlng).setContent('<small>LETTURA&hellip;</small>').openOn(map);
+
+    const [u, v] = await Promise.all([
+      PV.featureValue(map, LAYER_U, e.latlng, cur.date),
+      PV.featureValue(map, LAYER_V, e.latlng, cur.date)
+    ]);
+    const coord = `${e.latlng.lat.toFixed(2)}&deg;N &middot; ${e.latlng.lng.toFixed(2)}&deg;E`;
+
+    if (u.value !== undefined && v.value !== undefined) {
+      const speed = Math.hypot(u.value, v.value);
+      const nodi = speed * 1.943844;
+      // direzione verso cui scorre la corrente (convenzione oceanografica)
+      const deg = (Math.atan2(u.value, v.value) * 180 / Math.PI + 360) % 360;
+      const verso = ROSA[Math.round(deg / 45) % 8];
+      popup.setContent(
+        `<b>${speed.toFixed(2).replace('.', ',')} m/s</b> ` +
+        `<span>(${nodi.toFixed(1).replace('.', ',')} nodi)</span><br>` +
+        `<span>verso ${verso} &middot; ${Math.round(deg)}&deg;</span><br>` +
+        `<small>${coord}</small>`);
+    } else if (u.error === 'nodata' || v.error === 'nodata') {
+      popup.setContent(`<small>NESSUN DATO QUI</small><br><small>${coord}</small>`);
+    } else {
+      popup.setContent('<small>LETTURA PUNTUALE NON DISPONIBILE</small>');
+    }
+  });
+})();
+</script>
+</body>
+</html>
