@@ -1,5 +1,5 @@
 {
- "aggiornato": "2026-10-09T04:30Z",
+ "aggiornato": "2026-10-09T11:57Z",
  "dataset": "cmems_mod_med_phy-cur_anfc_4.2km_P1D-m",
  "profondita_m": 1,
  "giorni": [
@@ -47,6 +47,11 @@
    "data": "2026-10-17",
    "file": "2026-10-17.json",
    "vmax": 106.8
+  },
+  {
+   "data": "2026-10-18",
+   "file": "2026-10-18.json",
+   "vmax": NaN
   }
  ]
 }
