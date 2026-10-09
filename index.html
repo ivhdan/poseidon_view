@@ -10,19 +10,22 @@
   :root { --navy:#0a1e33; --parch:#f0e8d4; --rope:#b89b5e; --brass:#c8963c; }
   * { box-sizing: border-box; }
   body { margin:0; background:var(--parch); color:var(--navy); font-family:'Crimson Pro',Georgia,serif; }
-  main { max-width: 820px; margin: 0 auto; padding: 24px 16px 48px; }
+  main { max-width: 980px; margin: 0 auto; padding: 24px 16px 48px; }
   .kicker { font-family:'Cinzel',serif; font-size:.68rem; letter-spacing:.24em; color:#2e6d99; text-align:center; }
   h1 { font-family:'Cinzel Decorative',serif; font-size:clamp(1.6rem,6vw,2.4rem); text-align:center; margin:.3em 0 .1em; }
   .lead { text-align:center; font-size:1.1rem; font-style:italic; margin:0 0 20px; }
-  .rope { display:flex; align-items:center; gap:12px; margin:22px 0; color:var(--brass); font-size:1.3rem; }
+  .rope { display:flex; align-items:center; gap:12px; margin:26px 0; color:var(--brass); font-size:1.3rem; }
   .rope::before, .rope::after { content:''; flex:1; height:2px; opacity:.7;
     background:repeating-linear-gradient(90deg,#b89b5e 0,#b89b5e 6px,transparent 6px,transparent 10px,#d9c89a 10px,#d9c89a 16px,transparent 16px,transparent 20px); }
   h2 { font-family:'Cinzel',serif; font-size:1rem; letter-spacing:.14em; text-transform:uppercase; margin:0 0 8px; }
   p { font-size:1.05rem; line-height:1.5; margin:0 0 12px; }
-  iframe { display:block; width:100%; border:0; background:var(--navy); }
-  .h-map { height: 460px; }
-  .soon { padding:28px 16px; text-align:center; background:var(--navy); color:var(--parch); border:1px solid var(--rope);
-          font-family:'Cinzel',serif; letter-spacing:.14em; font-size:.8rem; text-transform:uppercase; }
+  details { margin-top:10px; }
+  summary { font-family:'Cinzel',serif; font-size:.72rem; letter-spacing:.14em; text-transform:uppercase; color:#2e6d99; cursor:pointer; }
+  .code { display:flex; gap:8px; align-items:stretch; margin-top:8px; }
+  .code code { flex:1; min-width:0; overflow-x:auto; white-space:nowrap; padding:10px 12px; background:var(--navy); color:var(--parch);
+               font:13px/1.4 ui-monospace,Menlo,Consolas,monospace; border:1px solid var(--rope); }
+  .code button { flex:none; padding:0 14px; border:1px solid var(--rope); background:#d9c89a; color:var(--navy);
+                 font-family:'Cinzel',serif; font-size:.7rem; letter-spacing:.12em; cursor:pointer; }
   footer { font-family:'Cinzel',serif; font-size:.6rem; letter-spacing:.2em; color:var(--rope); text-align:center; margin-top:32px; }
 </style>
 </head>
@@ -35,22 +38,43 @@
   <div class="rope">&#9875;</div>
 
   <h2>Temperatura del mare</h2>
-  <p>La temperatura dell'acqua in superficie misurata dai satelliti. Tocca un punto del mare per leggere il valore.</p>
-  <iframe class="h-map" src="sst/" title="Temperatura del Mediterraneo" loading="lazy"></iframe>
+  <p>La temperatura dell'acqua in superficie, oggi e nei prossimi nove giorni. Tocca un punto del mare per leggere il valore.</p>
+  <script src="embed.js" data-widget="temperatura" data-altezza="480px"></script>
+  <details><summary>Codice per Google Sites</summary><div class="code" data-widget="temperatura"></div></details>
 
   <div class="rope">&#9875;</div>
 
   <h2>Correnti marine</h2>
-  <p>Le correnti superficiali animate, da oggi ai prossimi nove giorni, dal modello oceanografico del Mediterraneo. Premi &#9654; per vedere l'evoluzione.</p>
-  <iframe class="h-map" src="correnti/" title="Correnti del Mediterraneo" loading="lazy"></iframe>
+  <p>Le correnti superficiali animate, da oggi ai prossimi nove giorni. Premi &#9654; per vedere come cambiano.</p>
+  <script src="embed.js" data-widget="correnti" data-altezza="480px"></script>
+  <details><summary>Codice per Google Sites</summary><div class="code" data-widget="correnti"></div></details>
 
   <div class="rope">&#9875;</div>
 
   <h2>Il Mediterraneo si scalda</h2>
-  <p>Temperature medie mensili dal 2000 a oggi.</p>
-  <div class="soon">Grafico in preparazione</div>
+  <p>La temperatura media del mare, mese per mese, dal 2000 a oggi. Scorri il grafico per tornare indietro negli anni.</p>
+  <script src="embed.js" data-widget="grafico" data-altezza="420px"></script>
+  <details><summary>Codice per Google Sites</summary><div class="code" data-widget="grafico"></div></details>
 
   <footer>MITO SUB &middot; A.S.D. &middot; SUSA &middot; DATI E.U. COPERNICUS MARINE SERVICE</footer>
 </main>
+<script>
+  // Codice da incollare in Google Sites, con l'indirizzo assoluto di questo sito
+  const base = new URL('embed.js', location.href).href;
+  document.querySelectorAll('.code').forEach(box => {
+    const txt = `<script src="${base}" data-widget="${box.dataset.widget}"><\/script>`;
+    const code = document.createElement('code');
+    code.textContent = txt;
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.textContent = 'Copia';
+    btn.onclick = async () => {
+      try { await navigator.clipboard.writeText(txt); btn.textContent = 'Copiato'; }
+      catch (e) { btn.textContent = 'Seleziona'; }
+      setTimeout(() => (btn.textContent = 'Copia'), 1800);
+    };
+    box.append(code, btn);
+  });
+</script>
 </body>
 </html>

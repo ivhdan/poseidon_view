@@ -19,24 +19,31 @@
 
 * { box-sizing: border-box; }
 
-html, body {
+/* Pagina dedicata al widget (riquadro "Incorpora" di Google Sites o pagina a schermo intero) */
+html.pv-pagina, html.pv-pagina body {
   margin: 0;
   padding: 0;
   height: 100%;
   background: var(--navy-900);
-  color: var(--parchment);
-  font-family: var(--font-body);
   -webkit-text-size-adjust: 100%;
 }
 
-/* Il widget occupa sempre tutta l'altezza dell'iframe di Google Sites */
+/* Contenitore creato da embed.js: alto quanto il riquadro, salvo data-altezza */
+.pv-root {
+  height: 100vh;
+  height: 100dvh;
+  color: var(--parchment);
+  font-family: var(--font-body);
+}
+
 .widget {
   display: flex;
   flex-direction: column;
-  height: 100vh;
-  height: 100dvh;
+  height: 100%;
   min-height: 320px;
+  background: var(--navy-900);
   border: 1px solid var(--rope);
+  overflow: hidden;
 }
 
 /* ---------- Testata ---------- */
@@ -298,6 +305,113 @@ canvas.particles {
 .days .day:hover { background: var(--navy-800); }
 .days .day.on { background: var(--brass-light); color: var(--navy-900); }
 .days .day.on .dw { color: var(--navy-700); }
+
+/* ---------- Grafico storico ---------- */
+.chart-body { display: flex; flex-direction: column; }
+.chart {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 6px 0 0;
+}
+.chart-note {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 2px 12px 4px 46px;
+  font-family: var(--font-title);
+  font-size: .64rem;
+  letter-spacing: .12em;
+  color: var(--rope);
+  text-transform: uppercase;
+}
+.chart-note b { color: var(--brass-light); font-size: .8rem; letter-spacing: .06em; }
+.chart-grid {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+}
+.chart-axis { flex: none; width: 40px; height: 100%; }
+.chart-scroll {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  touch-action: pan-x pan-y;        /* un dito: scorre il grafico in orizzontale, la pagina in verticale */
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: var(--navy-700) transparent;
+  cursor: grab;
+  outline: none;
+}
+.chart-scroll.drag { cursor: grabbing; }
+.chart-scroll:focus-visible { box-shadow: inset 0 0 0 1px var(--brass); }
+.chart-svg { display: block; }
+.chart-svg text, .chart-axis text { font-family: var(--font-body); }
+.ax-t { fill: var(--rope); font-size: 12px; }
+.yr-t { fill: var(--parchment); font-size: 12.5px; font-family: var(--font-title) !important; letter-spacing: .06em; }
+.yr-band { fill: rgba(240, 232, 212, .035); }
+.yr-sep { stroke: rgba(184, 155, 94, .28); stroke-width: 1; }
+.grid { stroke: rgba(240, 232, 212, .08); stroke-width: 1; }
+.monthly { fill: none; stroke-width: 2.4; stroke-linejoin: round; stroke-linecap: round; }
+.annual { fill: none; stroke: var(--brass-light); stroke-width: 1.6; stroke-dasharray: 5 4; opacity: .9; }
+.rec-dot { fill: #6a0b32; stroke: var(--parchment); stroke-width: 2; }
+.rec-t { fill: var(--parchment); font-size: 12px; font-family: var(--font-title) !important; letter-spacing: .05em; }
+.cross { stroke: var(--parchment); stroke-width: 1; stroke-dasharray: 2 3; opacity: .7; }
+.cross-dot { stroke: var(--navy-900); stroke-width: 2.5; }
+.chart-tip {
+  position: absolute;
+  z-index: 5;
+  padding: 5px 10px;
+  background: rgba(13, 36, 56, .96);
+  border: 1px solid var(--rope);
+  color: var(--parchment);
+  font-size: .9rem;
+  line-height: 1.25;
+  white-space: nowrap;
+  pointer-events: none;
+}
+.chart-tip b { font-family: var(--font-title); color: var(--brass-light); font-size: 1rem; }
+.chart-tip small { font-family: var(--font-title); font-size: .6rem; letter-spacing: .08em; color: var(--rope); text-transform: uppercase; }
+.chart-nav {
+  position: absolute;
+  top: 40%;
+  z-index: 6;
+  width: 30px;
+  height: 44px;
+  border: 1px solid var(--rope);
+  background: rgba(13, 36, 56, .9);
+  color: var(--brass-light);
+  font-size: 1.4rem;
+  line-height: 1;
+  cursor: pointer;
+  display: none;
+}
+.chart-nav.prev { left: 44px; }
+.chart-nav.next { right: 6px; }
+.chart-nav:hover { background: var(--navy-700); }
+@media (hover: hover) and (pointer: fine) { .chart-nav { display: block; } }
+.chart-hint {
+  flex: none;
+  color: var(--brass-light);
+  transition: opacity .4s;
+}
+.chart-hint.off { opacity: 0; }
+@media (hover: hover) and (pointer: fine) { .chart-hint { display: none; } }
+
+/* simboli della legenda nel piede */
+.lg-line, .lg-dash {
+  display: inline-block;
+  width: 18px;
+  height: 0;
+  vertical-align: middle;
+  margin-right: 2px;
+}
+.lg-line { border-top: 2.5px solid; border-image: linear-gradient(90deg, #2f88cc, #f1e7b4, #c42126) 1; }
+.lg-dash { border-top: 2px dashed var(--brass-light); }
 
 /* Su schermi molto stretti si nasconde il sottotitolo */
 @media (max-width: 360px) {

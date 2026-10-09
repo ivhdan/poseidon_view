@@ -3,68 +3,60 @@
 Widget sul mare Mediterraneo per il sito di **Mito Sub A.S.D.** (Susa), con dati
 E.U. Copernicus Marine Service.
 
-| Widget | Percorso | Dati |
+| Widget | `data-widget` | Dati |
 |---|---|---|
-| Temperatura superficiale del giorno | `sst/` | `SST_MED_SST_L4_NRT_OBSERVATIONS_010_004` (satellite, L4) |
-| Correnti superficiali animate, 10 giorni | `correnti/` | `MEDSEA_ANALYSISFORECAST_PHY_006_013` (modello, media giornaliera) |
-| Temperature medie mensili dal 2000 | `trend/` | in preparazione |
+| Temperatura del mare, oggi + 9 giorni | `temperatura` | modello `MEDSEA_ANALYSISFORECAST_PHY_006_013`, ~1 m |
+| Correnti animate, oggi + 9 giorni | `correnti` | modello `MEDSEA_ANALYSISFORECAST_PHY_006_013`, ~1 m |
+| Temperatura media mensile dal 2000 | `grafico` | rianalisi `MEDSEA_MULTIYEAR_PHY_006_004` + analisi per i mesi recenti |
 
-- **Temperatura**: legge le tile WMTS di Copernicus direttamente dal browser
-  (servizio pubblico, senza credenziali).
-- **Correnti**: ogni notte la GitHub Action *Aggiorna correnti* scarica con la
-  toolbox `copernicusmarine` le componenti `uo`/`vo` a circa 1 m di profondità per
-  oggi e i 9 giorni successivi, le media su una griglia di 0,125° e scrive un file
-  per giorno in `data/correnti/`. Il browser anima migliaia di particelle che seguono
-  il campo, in stile Windy.
-
-## Credenziali Copernicus
-
-Nel repo, **Settings → Secrets and variables → Actions**, due segreti:
-
-- `COPERNICUSMARINE_SERVICE_USERNAME`
-- `COPERNICUSMARINE_SERVICE_PASSWORD`
-
-Per lanciare subito l'aggiornamento: **Actions → Aggiorna correnti → Run workflow**.
-
-## Pubblicazione con GitHub Pages
-
-1. Su GitHub: **Settings → Pages**.
-2. *Source*: **Deploy from a branch**, branch `main`, cartella `/ (root)`.
-3. Dopo un minuto il sito è su `https://ivhdan.github.io/poseidon_view/`.
+Anteprima e codici pronti: `https://ivhdan.github.io/poseidon_view/`
 
 ## Inserimento in Google Sites
 
-Per ogni widget: **Inserisci → Incorpora → Da URL**.
+**Inserisci → Incorpora → Incorpora codice**, poi incolla una riga:
 
-| Widget | URL | Altezza consigliata |
+```html
+<script src="https://ivhdan.github.io/poseidon_view/embed.js" data-widget="temperatura"></script>
+<script src="https://ivhdan.github.io/poseidon_view/embed.js" data-widget="correnti"></script>
+<script src="https://ivhdan.github.io/poseidon_view/embed.js" data-widget="grafico"></script>
+```
+
+Il widget riempie il riquadro: l'altezza si regola trascinandone il bordo
+(consigliati 460–500 px per le mappe, 400–420 px per il grafico).
+Tutto il codice vive su GitHub: ogni modifica al repo arriva da sola ai widget
+già incorporati. Dopo una modifica a stili o script, aumentare `VERSIONE` in
+`embed.js` per forzare i browser a ricaricarli.
+
+## Come si aggiornano i dati
+
+| Workflow | Quando | Cosa fa |
 |---|---|---|
-| Temperatura | `https://ivhdan.github.io/poseidon_view/sst/` | 460 px |
-| Correnti | `https://ivhdan.github.io/poseidon_view/correnti/` | 460 px |
+| *Aggiorna mare (giornaliero)* | ogni giorno 05:17 UTC | `scripts/correnti.py` e `scripts/temperatura.py` → `data/correnti/`, `data/temperatura/` |
+| *Aggiorna grafico (mensile)* | il 12 di ogni mese | `scripts/trend.py` → `data/trend.json` (media pesata per area, Atlantico escluso) |
+| *Scopri dataset* | a mano | elenca i dataset Copernicus disponibili sul ramo `diagnostica` |
 
-Ogni widget riempie tutta l'altezza dell'incorporamento: basta trascinare il
-bordo del riquadro in Google Sites.
+Si possono lanciare subito da **Actions → nome del workflow → Run workflow**.
+Le credenziali Copernicus sono nei segreti del repo
+(`COPERNICUSMARINE_SERVICE_USERNAME`, `COPERNICUSMARINE_SERVICE_PASSWORD`).
 
-## Comportamento su smartphone
+## Comportamento
 
-- Su telefono la mappa parte dai mari italiani, su schermo largo da tutto il Mediterraneo.
-- Le particelle si fermano quando il widget non è visibile, per non consumare batteria;
-  su telefono sono meno numerose.
-- La mappa si sposta con **due dita**, così con un dito la pagina continua a scorrere.
-  Su PC lo zoom con la rotella richiede **Ctrl**.
-- **Toccando il mare** compare il valore puntuale (temperatura, oppure velocità e
-  direzione della corrente).
-- Il pulsante in alto a destra apre il widget a schermo intero.
+- **Telefono**: le mappe partono dai mari italiani; su schermo largo mostrano tutto il
+  Mediterraneo con l'Europa intorno. Si spostano con due dita (con un dito scorre la
+  pagina); su PC lo zoom con la rotella richiede Ctrl.
+- **Tocco sul mare**: temperatura, oppure velocità (m/s e nodi) e direzione della corrente.
+- **Barra dei giorni** con ▶ per vedere la previsione scorrere.
+- **Grafico**: si scorre con un dito (o trascinando col mouse, o con le frecce) per
+  tornare agli anni passati; toccando un mese compare il valore e la differenza dalla
+  media di quel mese.
+- Le particelle si fermano quando il widget non è visibile (batteria).
 
-## Configurazione
+## Personalizzazione
 
-- `sst/index.html`: `SCALA_MESE` imposta la scala colori di ogni mese (°C).
-- `assets/correnti-anim.js`: `V_MAX` (fondo scala, m/s), `RAMPA` (colori del campo),
-  `maxParticles` e `speed` (densità e velocità visiva delle particelle).
-- `.github/workflows/correnti.yml`: orario dell'aggiornamento notturno.
-- Se Copernicus rinomina un dataset (es. il suffisso `_202311`), si aggiorna la
-  costante `LAYER` / `BASE` in cima allo script.
-
-Il widget cerca automaticamente l'ultimo giorno disponibile, fino a 4 giorni indietro.
+- `assets/poseidon.js`: `SCALA_TEMPERATURA` (blu → rosso → amaranto, scala fissa
+  10–31 °C), `SCALA_CORRENTE`, inquadrature `MED_BOUNDS` / `ITA_BOUNDS`.
+- `assets/animazione.js`: `maxParticles`, `speed` (densità e velocità delle particelle).
+- `assets/w-grafico.js`: anni visibili per schermata (3 su telefono, 8 su PC).
 
 ## Licenza dati
 

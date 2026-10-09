@@ -1,112 +1,10 @@
 /* ==========================================================
    Poseidon View — animazione delle correnti stile Windy
-   Particelle su canvas che seguono il campo di velocita'
-   letto dai file data/correnti/AAAA-MM-GG.json
+   Migliaia di particelle su canvas seguono il campo di velocita'.
+   Il campo deve offrire vel(lon, lat) -> [u, v] in m/s oppure null.
    ========================================================== */
 
-const Correnti = (() => {
-
-  /* ---------- Scala colori del campo (m/s) ---------- */
-
-  const V_MAX = 0.8;
-  const RAMPA = ['#0b2540', '#123a5e', '#1b5e84', '#2a8aa0', '#57b3a8', '#a9c793', '#e6c36a'];
-
-  function hex2rgb(h) {
-    const n = parseInt(h.slice(1), 16);
-    return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
-  }
-
-  // Tabella di 256 colori interpolati lungo la rampa
-  const LUT = (() => {
-    const stops = RAMPA.map(hex2rgb);
-    const out = new Uint8ClampedArray(256 * 3);
-    for (let i = 0; i < 256; i++) {
-      const t = i / 255 * (stops.length - 1);
-      const k = Math.min(Math.floor(t), stops.length - 2);
-      const f = t - k;
-      for (let c = 0; c < 3; c++) {
-        out[i * 3 + c] = stops[k][c] + (stops[k + 1][c] - stops[k][c]) * f;
-      }
-    }
-    return out;
-  })();
-
-  /* ---------- Campo di velocita' ---------- */
-
-  class Campo {
-    constructor(j) {
-      this.data = j.data;
-      this.nx = j.nx; this.ny = j.ny;
-      this.lon0 = j.lon0; this.lat0 = j.lat0;
-      this.dlon = j.dlon; this.dlat = j.dlat;
-      const n = j.nx * j.ny;
-      this.u = new Float32Array(n);
-      this.v = new Float32Array(n);
-      for (let i = 0; i < n; i++) {
-        this.u[i] = j.u[i] === null ? NaN : j.u[i] / 100;   // cm/s -> m/s
-        this.v[i] = j.v[i] === null ? NaN : j.v[i] / 100;
-      }
-    }
-
-    // Velocita' [u, v] in m/s nel punto, interpolazione bilineare; null su terra
-    at(lon, lat) {
-      const fx = (lon - this.lon0) / this.dlon;
-      const fy = (lat - this.lat0) / this.dlat;
-      const x0 = Math.floor(fx), y0 = Math.floor(fy);
-      if (x0 < 0 || y0 < 0 || x0 >= this.nx - 1 || y0 >= this.ny - 1) return null;
-      const tx = fx - x0, ty = fy - y0;
-      const i00 = y0 * this.nx + x0, i10 = i00 + 1, i01 = i00 + this.nx, i11 = i01 + 1;
-      const u = this.u, v = this.v;
-      const a = u[i00], b = u[i10], c = u[i01], d = u[i11];
-      if (a !== a || b !== b || c !== c || d !== d) return null;   // NaN: costa o terra
-      const w00 = (1 - tx) * (1 - ty), w10 = tx * (1 - ty), w01 = (1 - tx) * ty, w11 = tx * ty;
-      return [a * w00 + b * w10 + c * w01 + d * w11,
-              v[i00] * w00 + v[i10] * w10 + v[i01] * w01 + v[i11] * w11];
-    }
-
-    // Valore della cella piu' vicina (per il tocco vicino alla costa)
-    nearest(lon, lat) {
-      const x = Math.round((lon - this.lon0) / this.dlon);
-      const y = Math.round((lat - this.lat0) / this.dlat);
-      if (x < 0 || y < 0 || x >= this.nx || y >= this.ny) return null;
-      const i = y * this.nx + x;
-      return isNaN(this.u[i]) ? null : [this.u[i], this.v[i]];
-    }
-
-    bounds() {
-      return [[this.lat0 - this.dlat / 2, this.lon0 - this.dlon / 2],
-              [this.lat0 + (this.ny - 0.5) * this.dlat, this.lon0 + (this.nx - 0.5) * this.dlon]];
-    }
-
-    // Immagine del campo colorato, ricampionata in Mercatore per allinearsi alla mappa
-    image() {
-      const b = this.bounds();
-      const merc = lat => Math.log(Math.tan(Math.PI / 4 + lat * Math.PI / 360));
-      const latFrom = y => (2 * Math.atan(Math.exp(y)) - Math.PI / 2) * 180 / Math.PI;
-      const yS = merc(b[0][0]), yN = merc(b[1][0]);
-      const W = this.nx, H = Math.round(this.ny * 1.25);
-      const cv = document.createElement('canvas');
-      cv.width = W; cv.height = H;
-      const ctx = cv.getContext('2d');
-      const img = ctx.createImageData(W, H);
-      for (let r = 0; r < H; r++) {
-        const lat = latFrom(yN - (r + 0.5) / H * (yN - yS));
-        const j = Math.round((lat - this.lat0) / this.dlat);
-        if (j < 0 || j >= this.ny) continue;
-        for (let x = 0; x < W; x++) {
-          const i = j * this.nx + x;
-          const u = this.u[i];
-          if (u !== u) continue;                      // terra: trasparente
-          const s = Math.min(Math.hypot(u, this.v[i]) / V_MAX, 1);
-          const k = Math.round(s * 255) * 3, p = (r * W + x) * 4;
-          img.data[p] = LUT[k]; img.data[p + 1] = LUT[k + 1]; img.data[p + 2] = LUT[k + 2];
-          img.data[p + 3] = 235;
-        }
-      }
-      ctx.putImageData(img, 0, 0);
-      return cv.toDataURL('image/png');
-    }
-  }
+const Animazione = (() => {
 
   /* ---------- Particelle ---------- */
 
@@ -195,7 +93,7 @@ const Correnti = (() => {
     velAt(x, y) {
       if (!this.campo) return null;
       const ll = this.map.containerPointToLatLng([x, y]);
-      return this.campo.at(ll.lng, ll.lat);
+      return this.campo.vel(ll.lng, ll.lat);
     }
 
     start() {
@@ -256,5 +154,5 @@ const Correnti = (() => {
     }
   }
 
-  return { Campo, Animazione, RAMPA, V_MAX };
+  return Animazione;
 })();
