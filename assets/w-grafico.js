@@ -178,7 +178,10 @@
       // record
       const rx = X(record.k), ry = Y(record.v);
       svg('circle', { cx: rx, cy: ry, r: 4.5, class: 'rec-dot' }, plot);
-      const rt = svg('text', { x: rx, y: ry - 10, class: 'rec-t', 'text-anchor': 'middle' }, plot);
+      // etichetta allineata al bordo se il record cade all'inizio o alla fine della serie
+      const anc = rx > Wtot - 60 ? 'end' : rx < 60 ? 'start' : 'middle';
+      const rt = svg('text', { x: rx + (anc === 'end' ? 6 : anc === 'start' ? -6 : 0), y: ry - 11,
+                               class: 'rec-t', 'text-anchor': anc }, plot);
       rt.textContent = `record ${PV.num(record.v)}°`;
 
       // segno di selezione (spostato al tocco)

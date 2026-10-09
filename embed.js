@@ -14,7 +14,7 @@
    ========================================================== */
 
 (function () {
-  var VERSIONE = '3';     // cambiarla forza i browser a ricaricare stili e script
+  var VERSIONE = '4';     // cambiarla forza i browser a ricaricare stili e script
 
   var script = document.currentScript;
   if (!script) return;
