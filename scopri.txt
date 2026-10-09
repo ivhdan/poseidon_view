@@ -1,0 +1,64 @@
+
+===== SST_MED_SST_L4_NRT_OBSERVATIONS_010_004
+SST_MED_SSTA_L4_NRT_OBSERVATIONS_010_004_b | ver 202607 | part default | ['sst_anomaly'] | 1199145600000.0 -> 1791417600000.0 step 86400000.0
+SST_MED_SSTA_L4_NRT_OBSERVATIONS_010_004_d | ver 202607 | part default | ['sst_anomaly'] | 1199145600000.0 -> 1791417600000.0 step 86400000.0
+SST_MED_SST_L4_NRT_OBSERVATIONS_010_004_a_V2 | ver 202311 | part default | ['analysed_sst', 'analysis_error', 'mask', 'sea_ice_fraction'] | 1199145600000.0 -> 1791417600000.0 step 86400000.0
+SST_MED_SST_L4_NRT_OBSERVATIONS_010_004_c_V2 | ver 202311 | part default | ['analysed_sst', 'analysis_error', 'mask', 'sea_ice_fraction'] | 1199145600000.0 -> 1791417600000.0 step 86400000.0
+
+===== MEDSEA_MULTIYEAR_PHY_006_004
+cmems_mod_med_phy-cur_my_4.2km_P1D-m | ver 202511 | part default | ['uo', 'vo'] | 536457600000.0 -> 1788134400000.0 step 86400000.0
+cmems_mod_med_phy-cur_my_4.2km_P1M-m | ver 202511 | part default | ['uo', 'vo'] | None -> None step None
+cmems_mod_med_phy-cur_my_4.2km_P1Y-m | ver 202211 | part default | ['uo', 'vo'] | None -> None step None
+cmems_mod_med_phy-cur_my_4.2km_PT1H-m | ver 202511 | part default | ['uo', 'vo'] | 536457600000.0 -> 1788217200000.0 step 3600000.0
+cmems_mod_med_phy-hflux_my_4.2km_P1D-m | ver 202411 | part default | ['hfds', 'hfls', 'hfss', 'rlds', 'rsntds'] | 536457600000.0 -> 1753920000000.0 step 86400000.0
+cmems_mod_med_phy-hflux_my_4.2km_P1M-m | ver 202411 | part default | ['hfds', 'hfls', 'hfss', 'rlds', 'rsntds'] | None -> None step None
+cmems_mod_med_phy-mflux_my_4.2km_P1D-m | ver 202411 | part default | ['tauuo', 'tauvo'] | 536457600000.0 -> 1753920000000.0 step 86400000.0
+cmems_mod_med_phy-mflux_my_4.2km_P1M-m | ver 202411 | part default | ['tauuo', 'tauvo'] | None -> None step None
+cmems_mod_med_phy-mld_my_4.2km_P1D-m | ver 202511 | part default | ['mlotst'] | 536457600000.0 -> 1788134400000.0 step 86400000.0
+cmems_mod_med_phy-mld_my_4.2km_P1M-m | ver 202511 | part default | ['mlotst'] | None -> None step None
+cmems_mod_med_phy-mld_my_4.2km_P1Y-m | ver 202211 | part default | ['mlotst'] | None -> None step None
+cmems_mod_med_phy-sal_my_4.2km_P1D-m | ver 202511 | part default | ['so'] | 536457600000.0 -> 1788134400000.0 step 86400000.0
+cmems_mod_med_phy-sal_my_4.2km_P1M-m | ver 202511 | part default | ['so'] | None -> None step None
+cmems_mod_med_phy-sal_my_4.2km_P1Y-m | ver 202211 | part default | ['so'] | None -> None step None
+cmems_mod_med_phy-ssh_my_4.2km_P1D-m | ver 202511 | part default | ['zos'] | 536457600000.0 -> 1788134400000.0 step 86400000.0
+cmems_mod_med_phy-ssh_my_4.2km_P1M-m | ver 202511 | part default | ['zos'] | None -> None step None
+cmems_mod_med_phy-ssh_my_4.2km_P1Y-m | ver 202211 | part default | ['zos'] | None -> None step None
+cmems_mod_med_phy-ssh_my_4.2km_PT1H-m | ver 202511 | part default | ['zos'] | 536457600000.0 -> 1788217200000.0 step 3600000.0
+cmems_mod_med_phy-tem_my_4.2km_P1Y-m | ver 202211 | part default | ['bottomT', 'thetao'] | None -> None step None
+cmems_mod_med_phy-temp_my_4.2km_P1D-m | ver 202511 | part default | ['bottomT', 'thetao'] | 536457600000.0 -> 1788134400000.0 step 86400000.0
+cmems_mod_med_phy-temp_my_4.2km_P1M-m | ver 202511 | part default | ['bottomT', 'thetao'] | None -> None step None
+cmems_mod_med_phy-wflux_my_4.2km_P1D-m | ver 202411 | part default | ['evs', 'friver', 'pr'] | 536457600000.0 -> 1753920000000.0 step 86400000.0
+cmems_mod_med_phy-wflux_my_4.2km_P1M-m | ver 202411 | part default | ['evs', 'friver', 'pr'] | None -> None step None
+cmems_mod_med_phy_my_4.2km-climatology_P1M-m | ver 202211 | part default | ['bottomT_avg', 'bottomT_std', 'climatology_bnds', 'mlotst_avg', 'mlotst_std', 'so_avg', 'so_std', 'thetao_avg', 'thetao_std', 'uo_avg', 'uo_std', 'vo_avg', 'vo_std', 'zos_avg', 'zos_std'] | None -> None step None
+cmems_mod_med_phy_my_4.2km_static | ver 202211 | part bathy | ['deptho', 'deptho_lev', 'mask'] | 
+cmems_mod_med_phy_my_4.2km_static | ver 202211 | part coords | ['e1t', 'e2t', 'e3t'] | 
+cmems_mod_med_phy_my_4.2km_static | ver 202211 | part mdt | ['mdt'] | 
+
+===== MEDSEA_ANALYSISFORECAST_PHY_006_013
+cmems_mod_med_phy-cur_anfc_4.2km-2D_PT1H-m | ver 202511 | part default | ['uo', 'vo'] | 1724544000000.0 -> 1792278000000.0 step 3600000.0
+cmems_mod_med_phy-cur_anfc_4.2km-3D_PT1H-m | ver 202511 | part default | ['uo', 'vo'] | 1759708800000.0 -> 1791846000000.0 step 3600000.0
+cmems_mod_med_phy-cur_anfc_4.2km_P1D-m | ver 202511 | part default | ['uo', 'vo'] | 1724716800000.0 -> 1792195200000.0 step 86400000.0
+cmems_mod_med_phy-cur_anfc_4.2km_P1M-m | ver 202511 | part default | ['uo', 'vo'] | None -> None step None
+cmems_mod_med_phy-cur_anfc_4.2km_PT15M-i | ver 202511 | part default | ['uo', 'vo'] | 1724371200000.0 -> 1791848700000.0 step 900000.0
+cmems_mod_med_phy-cur_anfc_detided-4.2km_P1D-m | ver 202511 | part default | ['uo_detided', 'vo_detided'] | 1724716800000.0 -> 1792108800000.0 step 86400000.0
+cmems_mod_med_phy-mld_anfc_4.2km-2D_PT1H-m | ver 202511 | part default | ['mlotst'] | 1724544000000.0 -> 1792278000000.0 step 3600000.0
+cmems_mod_med_phy-mld_anfc_4.2km_P1D-m | ver 202511 | part default | ['mlotst'] | 1724716800000.0 -> 1792195200000.0 step 86400000.0
+cmems_mod_med_phy-mld_anfc_4.2km_P1M-m | ver 202511 | part default | ['mlotst'] | None -> None step None
+cmems_mod_med_phy-sal_anfc_4.2km-2D_PT1H-m | ver 202511 | part default | ['so'] | 1724544000000.0 -> 1792278000000.0 step 3600000.0
+cmems_mod_med_phy-sal_anfc_4.2km-3D_PT1H-m | ver 202511 | part default | ['so'] | 1759708800000.0 -> 1791846000000.0 step 3600000.0
+cmems_mod_med_phy-sal_anfc_4.2km_P1D-m | ver 202511 | part default | ['so'] | 1724716800000.0 -> 1792195200000.0 step 86400000.0
+cmems_mod_med_phy-sal_anfc_4.2km_P1M-m | ver 202511 | part default | ['so'] | None -> None step None
+cmems_mod_med_phy-ssh_anfc_4.2km-2D_PT1H-m | ver 202511 | part default | ['zos'] | 1724544000000.0 -> 1792278000000.0 step 3600000.0
+cmems_mod_med_phy-ssh_anfc_4.2km_P1D-m | ver 202511 | part default | ['zos'] | 1724716800000.0 -> 1792195200000.0 step 86400000.0
+cmems_mod_med_phy-ssh_anfc_4.2km_P1M-m | ver 202511 | part default | ['zos'] | None -> None step None
+cmems_mod_med_phy-ssh_anfc_4.2km_PT15M-i | ver 202511 | part default | ['zos'] | 1724371200000.0 -> 1791848700000.0 step 900000.0
+cmems_mod_med_phy-ssh_anfc_detided-4.2km_P1D-m | ver 202511 | part default | ['zos_detided'] | 1724716800000.0 -> 1792108800000.0 step 86400000.0
+cmems_mod_med_phy-tem_anfc_4.2km-2D_PT1H-m | ver 202511 | part default | ['thetao'] | 1724544000000.0 -> 1792278000000.0 step 3600000.0
+cmems_mod_med_phy-tem_anfc_4.2km-3D_PT1H-m | ver 202511 | part default | ['bottomT', 'thetao'] | 1759708800000.0 -> 1791846000000.0 step 3600000.0
+cmems_mod_med_phy-tem_anfc_4.2km_P1D-m | ver 202511 | part default | ['bottomT', 'thetao'] | 1724716800000.0 -> 1792195200000.0 step 86400000.0
+cmems_mod_med_phy-tem_anfc_4.2km_P1M-m | ver 202511 | part default | ['bottomT', 'thetao'] | None -> None step None
+cmems_mod_med_phy-wcur_anfc_4.2km_P1D-m | ver 202511 | part default | ['wo'] | 1724716800000.0 -> 1792195200000.0 step 86400000.0
+cmems_mod_med_phy-wcur_anfc_4.2km_P1M-m | ver 202511 | part default | ['wo'] | None -> None step None
+cmems_mod_med_phy_anfc_4.2km_static | ver 202311 | part bathy | ['deptho', 'deptho_lev', 'mask'] | 
+cmems_mod_med_phy_anfc_4.2km_static | ver 202311 | part coords | ['e1t', 'e2t', 'e3t'] | 
+cmems_mod_med_phy_anfc_4.2km_static | ver 202311 | part mdt | ['mdt'] | 
