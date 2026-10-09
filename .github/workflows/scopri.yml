@@ -8,6 +8,9 @@ on:
         required: false
         default: ""
 
+permissions:
+  contents: write
+
 jobs:
   scopri:
     runs-on: ubuntu-latest
@@ -23,4 +26,15 @@ jobs:
       - env:
           COPERNICUSMARINE_SERVICE_USERNAME: ${{ secrets.COPERNICUSMARINE_SERVICE_USERNAME }}
           COPERNICUSMARINE_SERVICE_PASSWORD: ${{ secrets.COPERNICUSMARINE_SERVICE_PASSWORD }}
-        run: python scripts/scopri.py ${{ github.event.inputs.prodotti }}
+        run: python scripts/scopri.py ${{ github.event.inputs.prodotti }} | tee scopri.txt
+      - name: Salva il risultato sul ramo "diagnostica"
+        run: |
+          git config user.name "poseidon-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          mv scopri.txt /tmp/scopri.txt
+          git checkout --orphan diagnostica
+          git rm -rfq .
+          cp /tmp/scopri.txt scopri.txt
+          git add scopri.txt
+          git commit -qm "Elenco dataset $(date -u +%F)"
+          git push -f origin diagnostica
