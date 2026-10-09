@@ -1,0 +1,48 @@
+name: Aggiorna grafico (mensile)
+
+on:
+  schedule:
+    - cron: "41 6 12 * *"     # il 12 di ogni mese: la media del mese precedente e' pronta
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: dati
+  cancel-in-progress: false
+
+jobs:
+  mensile:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: scripts/requirements.txt
+
+      - name: Installa la toolbox Copernicus
+        run: pip install -r scripts/requirements.txt
+
+      - name: Medie mensili dal 2000
+        env:
+          COPERNICUSMARINE_SERVICE_USERNAME: ${{ secrets.COPERNICUSMARINE_SERVICE_USERNAME }}
+          COPERNICUSMARINE_SERVICE_PASSWORD: ${{ secrets.COPERNICUSMARINE_SERVICE_PASSWORD }}
+        run: python scripts/trend.py --da 2000 --out data/trend.json
+
+      - name: Pubblica i dati
+        run: |
+          git config user.name "poseidon-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/trend.json
+          if git diff --cached --quiet; then
+            echo "Nessuna novita'."
+          else
+            git commit -m "Medie mensili aggiornate $(date -u +%Y-%m-%d)"
+            git pull --rebase
+            git push
+          fi

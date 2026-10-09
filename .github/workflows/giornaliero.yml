@@ -1,9 +1,9 @@
-name: Aggiorna correnti
+name: Aggiorna mare (giornaliero)
 
 on:
   schedule:
     - cron: "17 5 * * *"      # ogni giorno alle 05:17 UTC (07:17 ora italiana estiva)
-  workflow_dispatch:           # avvio manuale da Actions -> Aggiorna correnti -> Run workflow
+  workflow_dispatch:           # avvio manuale: Actions -> Aggiorna mare -> Run workflow
 
 permissions:
   contents: write
@@ -13,9 +13,12 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  correnti:
+  giornaliero:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    env:
+      COPERNICUSMARINE_SERVICE_USERNAME: ${{ secrets.COPERNICUSMARINE_SERVICE_USERNAME }}
+      COPERNICUSMARINE_SERVICE_PASSWORD: ${{ secrets.COPERNICUSMARINE_SERVICE_PASSWORD }}
     steps:
       - uses: actions/checkout@v4
 
@@ -28,21 +31,24 @@ jobs:
       - name: Installa la toolbox Copernicus
         run: pip install -r scripts/requirements.txt
 
-      - name: Scarica le correnti
-        env:
-          COPERNICUSMARINE_SERVICE_USERNAME: ${{ secrets.COPERNICUSMARINE_SERVICE_USERNAME }}
-          COPERNICUSMARINE_SERVICE_PASSWORD: ${{ secrets.COPERNICUSMARINE_SERVICE_PASSWORD }}
+      # se uno dei due fallisce, l'altro viene comunque pubblicato
+      - name: Correnti
+        continue-on-error: true
         run: python scripts/correnti.py --giorni 10 --fattore 3 --out data/correnti
+
+      - name: Temperatura
+        continue-on-error: true
+        run: python scripts/temperatura.py --giorni 10 --fattore 2 --out data/temperatura
 
       - name: Pubblica i dati
         run: |
           git config user.name "poseidon-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/correnti
+          git add data
           if git diff --cached --quiet; then
             echo "Nessuna novita'."
           else
-            git commit -m "Correnti aggiornate $(date -u +%Y-%m-%d)"
+            git commit -m "Dati giornalieri $(date -u +%Y-%m-%d)"
             git pull --rebase
             git push
           fi

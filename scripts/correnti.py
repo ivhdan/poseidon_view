@@ -55,6 +55,15 @@ def alleggerisci(ds, fattore):
     return ds.load()
 
 
+def maschera_atlantico(lon, lat):
+    """True dove la griglia cade in Atlantico (golfo di Biscaglia, oltre Gibilterra).
+
+    Il dominio del modello include un pezzo di Atlantico che non e' Mediterraneo.
+    """
+    LON, LAT = np.meshgrid(np.asarray(lon), np.asarray(lat))
+    return (LON < -5.6) | ((LAT > 42.0) & (LON < 1.0))
+
+
 def codifica(u, v, lon, lat, data):
     """Campo di un giorno -> dizionario JSON compatto.
 
@@ -68,10 +77,7 @@ def codifica(u, v, lon, lat, data):
     lon = np.asarray(lon, dtype="float64")
     lat = np.asarray(lat, dtype="float64")
 
-    # Il dominio del modello include un pezzo di Atlantico (golfo di Biscaglia,
-    # Atlantico oltre Gibilterra): non e' Mediterraneo, si toglie.
-    LON, LAT = np.meshgrid(lon, lat)
-    atlantico = (LON < -5.6) | ((LAT > 42.0) & (LON < 1.0))
+    atlantico = maschera_atlantico(lon, lat)
     u = np.where(atlantico, np.nan, u)
     v = np.where(atlantico, np.nan, v)
     passo_lon = float(np.median(np.diff(lon)))
