@@ -36,6 +36,15 @@ html.pv-pagina, html.pv-pagina body {
   font-family: var(--font-body);
 }
 
+/* Isola il widget dagli stili della pagina che lo ospita */
+.pv-root *, .pv-root *::before, .pv-root *::after { box-sizing: border-box; }
+.pv-root header, .pv-root footer, .pv-root nav, .pv-root h1, .pv-root p {
+  margin: 0;
+  text-align: left;
+  line-height: normal;
+}
+.pv-root button { margin: 0; font: inherit; }
+
 .widget {
   display: flex;
   flex-direction: column;
@@ -48,6 +57,7 @@ html.pv-pagina, html.pv-pagina body {
 
 /* ---------- Testata ---------- */
 .w-head {
+  flex: none;
   display: flex;
   align-items: center;
   gap: 10px;
@@ -181,6 +191,7 @@ html.pv-pagina, html.pv-pagina body {
 
 /* ---------- Piede ---------- */
 .w-foot {
+  flex: none;
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
@@ -262,6 +273,7 @@ canvas.particles {
 
 /* ---------- Barra dei giorni (stile timeline Windy) ---------- */
 .days {
+  flex: none;
   display: flex;
   align-items: stretch;
   gap: 0;
