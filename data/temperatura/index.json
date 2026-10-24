@@ -1,61 +1,61 @@
 {
- "aggiornato": "2026-10-23T10:10Z",
+ "aggiornato": "2026-10-24T09:36Z",
  "dataset": "cmems_mod_med_phy-tem_anfc_4.2km_P1D-m",
  "profondita_m": 1,
  "giorni": [
   {
-   "data": "2026-10-23",
-   "file": "2026-10-23.json",
-   "tmin": 17.7,
-   "tmax": 30.8
-  },
-  {
    "data": "2026-10-24",
    "file": "2026-10-24.json",
-   "tmin": 17.7,
-   "tmax": 30.2
+   "tmin": 17.6,
+   "tmax": 30.6
   },
   {
    "data": "2026-10-25",
    "file": "2026-10-25.json",
    "tmin": 17.5,
-   "tmax": 29.5
+   "tmax": 30.0
   },
   {
    "data": "2026-10-26",
    "file": "2026-10-26.json",
-   "tmin": 17.1,
-   "tmax": 28.6
+   "tmin": 17.0,
+   "tmax": 29.2
   },
   {
    "data": "2026-10-27",
    "file": "2026-10-27.json",
-   "tmin": 16.9,
-   "tmax": 28.0
+   "tmin": 16.8,
+   "tmax": 28.5
   },
   {
    "data": "2026-10-28",
    "file": "2026-10-28.json",
-   "tmin": 16.9,
-   "tmax": 27.5
+   "tmin": 16.4,
+   "tmax": 27.9
   },
   {
    "data": "2026-10-29",
    "file": "2026-10-29.json",
-   "tmin": 17.2,
-   "tmax": 27.1
+   "tmin": 16.1,
+   "tmax": 27.4
   },
   {
    "data": "2026-10-30",
    "file": "2026-10-30.json",
-   "tmin": 17.0,
-   "tmax": 26.7
+   "tmin": 16.4,
+   "tmax": 26.9
   },
   {
    "data": "2026-10-31",
    "file": "2026-10-31.json",
-   "tmin": 16.7,
-   "tmax": 26.4
+   "tmin": 16.3,
+   "tmax": 26.6
+  },
+  {
+   "data": "2026-11-01",
+   "file": "2026-11-01.json",
+   "tmin": 16.4,
+   "tmax": 26.2
   }
  ]
 }
