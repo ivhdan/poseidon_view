@@ -1,52 +1,52 @@
 {
- "aggiornato": "2026-10-26T11:12Z",
+ "aggiornato": "2026-10-27T10:39Z",
  "dataset": "cmems_mod_med_phy-cur_anfc_4.2km_P1D-m",
  "profondita_m": 1,
  "giorni": [
   {
-   "data": "2026-10-26",
-   "file": "2026-10-26.json",
-   "vmax": 82.1
-  },
-  {
    "data": "2026-10-27",
    "file": "2026-10-27.json",
-   "vmax": 90.9
+   "vmax": 85.8
   },
   {
    "data": "2026-10-28",
    "file": "2026-10-28.json",
-   "vmax": 93.4
+   "vmax": 100.3
   },
   {
    "data": "2026-10-29",
    "file": "2026-10-29.json",
-   "vmax": 75.5
+   "vmax": 79.1
   },
   {
    "data": "2026-10-30",
    "file": "2026-10-30.json",
-   "vmax": 76.0
+   "vmax": 71.2
   },
   {
    "data": "2026-10-31",
    "file": "2026-10-31.json",
-   "vmax": 85.7
+   "vmax": 70.2
   },
   {
    "data": "2026-11-01",
    "file": "2026-11-01.json",
-   "vmax": 103.3
+   "vmax": 67.8
   },
   {
    "data": "2026-11-02",
    "file": "2026-11-02.json",
-   "vmax": 91.7
+   "vmax": 93.5
   },
   {
    "data": "2026-11-03",
    "file": "2026-11-03.json",
-   "vmax": 86.7
+   "vmax": 89.8
+  },
+  {
+   "data": "2026-11-04",
+   "file": "2026-11-04.json",
+   "vmax": 85.6
   }
  ]
 }
